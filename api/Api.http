@@ -1,0 +1,49 @@
+@Api_HostAddress = http://localhost:5238
+
+### Categorie
+GET {{Api_HostAddress}}/api/categorie
+
+### Tutte le richieste
+GET {{Api_HostAddress}}/api/richieste
+
+### Una richiesta
+GET {{Api_HostAddress}}/api/richieste/1
+
+### Nuova richiesta
+POST {{Api_HostAddress}}/api/richieste
+Content-Type: application/json
+
+{
+  "dataInizio": "2026-12-01",
+  "dataFine": "2026-12-03",
+  "categoriaId": 1,
+  "motivazione": "Ferie natalizie",
+  "utenteId": 1
+}
+
+### Modifica richiesta
+PUT {{Api_HostAddress}}/api/richieste/1
+Content-Type: application/json
+
+{
+  "dataInizio": "2026-12-02",
+  "dataFine": "2026-12-04",
+  "categoriaId": 1,
+  "motivazione": "Ferie natalizie (modificate)"
+}
+
+### Elimina richiesta
+DELETE {{Api_HostAddress}}/api/richieste/1
+
+### Registrazione
+POST {{Api_HostAddress}}/api/utenti/register
+Content-Type: application/json
+
+{
+  "nome": "Mario",
+  "cognome": "Rossi",
+  "email": "mariro.rossi@example.com",
+  "passwordHash": "Password123!"
+
+}
+
