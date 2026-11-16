@@ -3,6 +3,7 @@ using Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Dtos;
+using Microsoft.AspNetCore.Authorization
 
 namespace Api.Controllers;
 
@@ -18,7 +19,7 @@ namespace Api.Controllers;
 //        400 Bad Request  date incoerenti, categoria o utente inesistenti
 
 // PUT    /api/richieste/{id}   Modifica date, categoria e motivazione
-//        200 OK  richiesta aggiornata, 204 invece se voglio restituire l'oggetto [NoContent()]
+//        200 OK  richiesta aggiornata, 204 invece [NoContent()]
 //        400 Bad Request  richiesta non "In attesa" o dati non validi
 //        404 Not Found  id inesistente
 
@@ -40,7 +41,7 @@ public class RichiesteController : ControllerBase
 
 
 [HttpGet]
-public async Task<ActionResult<List<RichiestePermesso>>> GetRichieste()
+public async Task<ActionResult<List<RichiestaDto>>> GetRichieste()
 {
     var richieste = await _context.RichiestePermessos.OrderByDescending(r=>r.DataRichiesta).Select(r=> new RichiestaDto{
         RichiestaId = r.RichiestaId,
@@ -54,12 +55,36 @@ public async Task<ActionResult<List<RichiestePermesso>>> GetRichieste()
         UtenteId=r.UtenteId,
         Richiedente= r.Utente.Nome + " " + r.Utente.Cognome,
         DataValutazione = r.DataValutazione,
-        Valutatore = r.UtenteValutazione==null? null : r.UtenteValutazione.Nome + "" + r.UtenteValutazione.Cognome,
+        Valutatore = r.UtenteValutazione==null? null : r.UtenteValutazione.Nome + " " + r.UtenteValutazione.Cognome,
         ValutatoreId =  r.UtenteValutazioneId
 
     }).ToListAsync();
     return Ok(richieste);
 }
+
+
+
+[HttpGet("da-approvare")]
+[Authorize(Roles = "Responsabile")]
+
+public async Task<ActionResult<List<RichiestaDto>>> GetRichiesteDaApprovare(){
+    var richieste = await _context.RichiestePermessos.OrderBy(r=>r.DataRichiesta).Where(r=> r.Stato == "In attesa").Select(r=> new RichiestaDto{
+        RichiestaId = r.RichiestaId,
+        DataRichiesta = r.DataRichiesta,
+        DataInizio = r.DataInizio,
+        DataFine = r.DataFine,
+        Motivazione = r.Motivazione,
+        Stato = r.Stato,
+        CategoriaId = r.CategoriaId,
+        Categoria= r.Categoria.Descrizione,
+        UtenteId=r.UtenteId,
+        Richiedente= r.Utente.Nome + " " + r.Utente.Cognome
+       
+
+    }).ToListAsync();
+    return Ok(richieste);
+}
+
 
 
 [HttpGet("{id:int}")]
@@ -94,6 +119,11 @@ public async Task<ActionResult<RichiestaDto>> GetRichiesta(int id)
     return Ok(richiesta);
 }
 
+
+
+
+
+
 [HttpPost]
 public async Task<ActionResult<RichiestePermesso>> AddRichiesta(RichiestePermesso richiesta)
 {
@@ -119,29 +149,72 @@ public async Task<ActionResult<RichiestePermesso>> AddRichiesta(RichiestePermess
 
 
 [HttpPut("{id:int}")]
-public async Task<ActionResult<RichiestePermesso>> UpdateRichiesta(int id, RichiestePermesso richiesta)
+public async Task<IActionResult> UpdateRichiesta(int id, RichiestePermesso richiesta)
 {
     var esistente = await _context.RichiestePermessos.FindAsync(id);
     if (esistente == null)
         return NotFound();
 
+    
     if (esistente.Stato != "In attesa")
-        return BadRequest("Si possono modificare solo le richieste in attesa.");
+        return BadRequest("Si può modificare solo una richiesta in attesa.");
 
+   
     if (richiesta.DataFine < richiesta.DataInizio)
         return BadRequest("La data di fine non può precedere quella di inizio.");
 
-    if (!await _context.CategoriePermessos.AnyAsync(c => c.CategoriaId == richiesta.CategoriaId))
-        return BadRequest("Categoria non valida.");
-
+   
     esistente.DataInizio = richiesta.DataInizio;
     esistente.DataFine = richiesta.DataFine;
-    esistente.CategoriaId = richiesta.CategoriaId;
     esistente.Motivazione = richiesta.Motivazione;
+    esistente.CategoriaId = richiesta.CategoriaId;   // permette il cambio categoria
 
     await _context.SaveChangesAsync();
-    return Ok(esistente);
+    return NoContent();   // 204: modificato, niente body
 }
+
+[HttpPut("{id:int}/approva")]
+[Authorize(Roles = "Responsabile")]
+
+public async Task<ActionResult> ApprovaRichiesta (int id ){
+    var esistente = await _context.RichiestePermessos.FindAsync(id);
+    if(esistente==null){
+        return NotFound();
+    }
+    if(esistente.Stato!=="In attesa"){
+       return BadRequest("Non è possibile perché la richiesta non è in attesa")
+    }
+    esistente.DataValutazione = DateTime.UtcNow;
+    esistente.UtenteValutazioneId=// arriva dal token
+
+    esistente.Stato = "Approvato";
+    await _context.SaveChangesAsync();
+
+    return NoContent();
+}
+
+
+[HttpPut("{id:int}/rifiuta")]
+[Authorize(Roles = "Responsabile")]
+
+public async Task<ActionResult> RifiutaRichiesta (int id ){
+    var esistente = await _context.RichiestePermessos.FindAsync(id);
+     if(esistente==null){
+        return NotFound();
+    }
+      if(esistente.Stato!=="In attesa"){
+       return BadRequest("Non è possibile perché la richiesta non è in attesa")
+    }
+    esistente.DataValutazione = DateTime.UtcNow;
+    esistente.UtenteValutazioneId=// arriva dal token
+
+    esistente.Stato = "Rifiutato";
+    await _context.SaveChangesAsync();
+
+    return NoContent();
+
+}
+
 
 [HttpDelete("{id:int}")]
 public async Task<IActionResult> DeleteRichiesta(int id)
@@ -150,9 +223,14 @@ public async Task<IActionResult> DeleteRichiesta(int id)
     if (richiesta == null)
         return NotFound();
 
+    
+    if (richiesta.Stato != "In attesa")
+        return BadRequest("Si può eliminare solo una richiesta in attesa.");
+
     _context.RichiestePermessos.Remove(richiesta);
     await _context.SaveChangesAsync();
-
     return NoContent();
 }
+
 }
+

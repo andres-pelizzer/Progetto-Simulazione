@@ -15,7 +15,7 @@ public class RichiestaDto{
   public string Richiedente {get;set;}
 
   public DateTime? DataValutazione {get;set;}
-  public string Valutatore {get;set;}
+  public string? Valutatore {get;set;}
   public int? ValutatoreId{get;set;}
 
 }

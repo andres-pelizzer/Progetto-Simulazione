@@ -42,26 +42,26 @@ I dipendenti di un'azienda possono richiedere permessi per ferie, visite mediche
 Le informazioni che si vogliono gestire sono le seguenti.
 
 - **Utente**
-    - UtenteID (PK)
-    - Nome
-    - Cognome
-    - Email
-    - Password
-    - Ruolo (Dipendente / Responsabile)
+  - UtenteID (PK)
+  - Nome
+  - Cognome
+  - Email
+  - Password
+  - Ruolo (Dipendente / Responsabile)
 - **CategoriaPermesso**
-    - CategoriaID (PK)
-    - Descrizione
+  - CategoriaID (PK)
+  - Descrizione
 - **RichiestaPermesso**
-    - RichiestaID (PK)
-    - DataRichiesta
-    - DataInizio
-    - DataFine
-    - CategoriaID (FK)
-    - Motivazione (testo libero)
-    - Stato (In attesa, Approvato, Rifiutato)
-    - UtenteID (FK - richiedente)
-    - DataValutazione (data di approvazione o data di rifiuto)
-    - UtenteValutazioneID (FK - responsabile che ha approvato o rifiutato)
+  - RichiestaID (PK)
+  - DataRichiesta
+  - DataInizio
+  - DataFine
+  - CategoriaID (FK)
+  - Motivazione (testo libero)
+  - Stato (In attesa, Approvato, Rifiutato)
+  - UtenteID (FK - richiedente)
+  - DataValutazione (data di approvazione o data di rifiuto)
+  - UtenteValutazioneID (FK - responsabile che ha approvato o rifiutato)
 
 Il data model proposto è indicativo. Il candidato può integrarlo secondo necessità.
 
@@ -111,12 +111,12 @@ Nessuna.
 
 - Login / Registrazione
 - Dashboard dipendente con:
-    - Form per inserire una nuova richiesta di permesso
-    - Elenco richieste personali con stato
-    - Modifica ed eliminazione di richieste personali (solo se non approvate)
+  - Form per inserire una nuova richiesta di permesso
+  - Elenco richieste personali con stato
+  - Modifica ed eliminazione di richieste personali (solo se non approvate)
 - Dashboard responsabile con:
-    - Elenco richieste in attesa di approvazione
-    - Pulsanti per approvare/rifiutare una richiesta di permesso
+  - Elenco richieste in attesa di approvazione
+  - Pulsanti per approvare/rifiutare una richiesta di permesso
 
 ### Requisito avanzato (contribuisce al 20% del punteggio)
 

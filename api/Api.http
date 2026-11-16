@@ -42,7 +42,7 @@ Content-Type: application/json
 {
   "nome": "Mario",
   "cognome": "Rossi",
-  "email": "mariro.rossi@example.com",
+  "email": "mariror.rossi@example.com",
   "passwordHash": "Password123!"
 
 }

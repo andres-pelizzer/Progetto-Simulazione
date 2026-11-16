@@ -27,11 +27,12 @@ public class CategorieController : ControllerBase   // ControllerBase è la clas
         _context = context;
     }
 
+
 [HttpGet]
-public async Task<ActionResult<List<CategoriePermesso>>> GetCategorie()
+public async Task<ActionResult<List<CategoriaDto>>> GetCategorie()
 {
     var categorie = await _context.CategoriePermessos.OrderBy(c=>c.Descrizione).Select(c=>new CategoriaDto {
-        CategoriaId= c.CategoriaId,
+        CategoriaId = c.CategoriaId,
         Descrizione = c.Descrizione
     } ).ToListAsync();
     return Ok(categorie);
