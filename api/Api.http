@@ -1,49 +1,132 @@
 @Api_HostAddress = http://localhost:5238
 
-### Categorie
-GET {{Api_HostAddress}}/api/categorie
-
-### Tutte le richieste
-GET {{Api_HostAddress}}/api/richieste
-
-### Una richiesta
-GET {{Api_HostAddress}}/api/richieste/1
-
-### Nuova richiesta
-POST {{Api_HostAddress}}/api/richieste
+### Login responsabile
+# @name loginResp
+POST {{Api_HostAddress}}/api/utenti/login
 Content-Type: application/json
 
 {
-  "dataInizio": "2026-12-01",
-  "dataFine": "2026-12-03",
-  "categoriaId": 1,
-  "motivazione": "Ferie natalizie",
-  "utenteId": 1
+  "email": "laura.bianchi@azienda.example",
+  "password": "Password123!"
 }
 
-### Modifica richiesta
-PUT {{Api_HostAddress}}/api/richieste/1
+### Login dipendente
+# @name loginDip
+POST {{Api_HostAddress}}/api/utenti/login
 Content-Type: application/json
 
 {
-  "dataInizio": "2026-12-02",
-  "dataFine": "2026-12-04",
-  "categoriaId": 1,
-  "motivazione": "Ferie natalizie (modificate)"
+  "email": "mario.rossi@azienda.example",
+  "password": "Password123!"
 }
-
-### Elimina richiesta
-DELETE {{Api_HostAddress}}/api/richieste/1
 
 ### Registrazione
 POST {{Api_HostAddress}}/api/utenti/register
 Content-Type: application/json
 
 {
-  "nome": "Mario",
-  "cognome": "Rossi",
-  "email": "mariror.rossi@example.com",
-  "passwordHash": "Password123!"
-
+  "nome": "Test",
+  "cognome": "Utente",
+  "email": "test.utente@example.com",
+  "password": "Password123!"
 }
 
+### Utente collegato
+GET {{Api_HostAddress}}/api/utenti/me
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Categorie (con token)
+GET {{Api_HostAddress}}/api/categorie
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Categorie senza token (deve dare 401)
+GET {{Api_HostAddress}}/api/categorie
+
+### Richieste del dipendente (solo le sue: 4 per Mario)
+GET {{Api_HostAddress}}/api/richieste
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Richieste del responsabile (tutte: 19)
+GET {{Api_HostAddress}}/api/richieste
+Authorization: Bearer {{loginResp.response.body.$.token}}
+
+### Una richiesta propria (Mario, id 1): 200
+GET {{Api_HostAddress}}/api/richieste/1
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Una richiesta di un altro (Giulia, id 5) con il token di Mario: 404
+GET {{Api_HostAddress}}/api/richieste/5
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Da approvare, responsabile: 200
+GET {{Api_HostAddress}}/api/richieste/da-approvare
+Authorization: Bearer {{loginResp.response.body.$.token}}
+
+### Da approvare, dipendente: 403
+GET {{Api_HostAddress}}/api/richieste/da-approvare
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Nuova richiesta (utenteId non esiste più nel body: lo prende dal token)
+# @name nuova
+POST {{Api_HostAddress}}/api/richieste
+Authorization: Bearer {{loginDip.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "dataInizio": "2027-01-11",
+  "dataFine": "2027-01-13",
+  "categoriaId": 1,
+  "motivazione": "Ferie di gennaio"
+}
+
+### Nuova richiesta con date incoerenti: 400
+POST {{Api_HostAddress}}/api/richieste
+Authorization: Bearer {{loginDip.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "dataInizio": "2027-01-13",
+  "dataFine": "2027-01-11",
+  "categoriaId": 1,
+  "motivazione": "Date al contrario"
+}
+
+### Modifica la richiesta appena creata
+PUT {{Api_HostAddress}}/api/richieste/{{nuova.response.body.$.richiestaId}}
+Authorization: Bearer {{loginDip.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "dataInizio": "2027-01-12",
+  "dataFine": "2027-01-14",
+  "categoriaId": 1,
+  "motivazione": "Ferie di gennaio (modificate)"
+}
+
+### Modifica una richiesta già approvata (id 1): 400
+PUT {{Api_HostAddress}}/api/richieste/1
+Authorization: Bearer {{loginDip.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "dataInizio": "2026-09-08",
+  "dataFine": "2026-09-12",
+  "categoriaId": 1,
+  "motivazione": "Tentativo non consentito"
+}
+
+### Approva la richiesta appena creata (responsabile)
+PUT {{Api_HostAddress}}/api/richieste/{{nuova.response.body.$.richiestaId}}/approva
+Authorization: Bearer {{loginResp.response.body.$.token}}
+
+### Approva con il token del dipendente: 403
+PUT {{Api_HostAddress}}/api/richieste/{{nuova.response.body.$.richiestaId}}/approva
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Il dipendente elimina la richiesta ormai approvata: 400
+DELETE {{Api_HostAddress}}/api/richieste/{{nuova.response.body.$.richiestaId}}
+Authorization: Bearer {{loginDip.response.body.$.token}}
+
+### Il responsabile elimina la richiesta approvata: 204
+DELETE {{Api_HostAddress}}/api/richieste/{{nuova.response.body.$.richiestaId}}
+Authorization: Bearer {{loginResp.response.body.$.token}}

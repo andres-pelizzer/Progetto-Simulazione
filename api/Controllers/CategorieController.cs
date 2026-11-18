@@ -3,10 +3,12 @@ using Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers;
 
 [ApiController] // attiva comportamenti automatici , come la risposta 400 quando il body non rispetta le regole di validazione 
+[Authorize]
 [Route("api/[controller]")]
 
 // Tabella categorie
@@ -28,14 +30,15 @@ public class CategorieController : ControllerBase   // ControllerBase è la clas
     }
 
 
-[HttpGet]
-public async Task<ActionResult<List<CategoriaDto>>> GetCategorie()
-{
-    var categorie = await _context.CategoriePermessos.OrderBy(c=>c.Descrizione).Select(c=>new CategoriaDto {
-        CategoriaId = c.CategoriaId,
-        Descrizione = c.Descrizione
-    } ).ToListAsync();
-    return Ok(categorie);
-}
+    [HttpGet]
+    public async Task<ActionResult<List<CategoriaDto>>> GetCategorie()
+    {
+        var categorie = await _context.CategoriePermessos.OrderBy(c => c.Descrizione).Select(c => new CategoriaDto
+        {
+            CategoriaId = c.CategoriaId,
+            Descrizione = c.Descrizione
+        }).ToListAsync();
+        return Ok(categorie);
+    }
 }
 
