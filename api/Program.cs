@@ -20,7 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
 {
-    options.MapInboundClaims = false;   // NUOVO: i nomi dei claim restano "sub" e "role"
+    options.MapInboundClaims = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -31,8 +31,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-        NameClaimType = "sub",    // NUOVO
-        RoleClaimType = "role"    // NUOVO: dice a [Authorize(Roles=...)] dove leggere il ruolo
+        NameClaimType = "sub",
+        RoleClaimType = "role"
     };
 });
 
