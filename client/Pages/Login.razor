@@ -33,10 +33,10 @@
     private async Task OnSubmit(LoginModel m)
     {
         occupato = true;
-        errore = await Auth.LoginAsync(m.Email, m.Password);   // null = login riuscito
+        errore = await Auth.LoginAsync(m.Email, m.Password);
         occupato = false;
 
         if (errore == null)
-            Nav.NavigateTo("/");   // poi qui andrà il redirect in base al ruolo
+            Nav.NavigateTo("/");
     }
 }

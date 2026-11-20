@@ -40,3 +40,4 @@ public class AuthService
 
   public Task LogoutAsync() => _provider.Logout();
 }
+
