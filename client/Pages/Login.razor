@@ -1,0 +1,42 @@
+@page "/login"
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<RadzenCard Style="max-width: 420px; margin: 3rem auto;">
+    <RadzenText TextStyle="TextStyle.H5">Accedi</RadzenText>
+
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Visible="@(errore != null)" AllowClose="false">@errore</RadzenAlert>
+
+    <RadzenTemplateForm TItem="LoginModel" Data="@model" Submit="@OnSubmit">
+        <RadzenStack Gap="1rem">
+            <RadzenFormField Text="Email">
+                <RadzenTextBox @bind-Value="model.Email" Name="Email" />
+            </RadzenFormField>
+            <RadzenRequiredValidator Component="Email" Text="Email obbligatoria" />
+
+            <RadzenFormField Text="Password">
+                <RadzenPassword @bind-Value="model.Password" Name="Password" />
+            </RadzenFormField>
+            <RadzenRequiredValidator Component="Password" Text="Password obbligatoria" />
+
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Accedi" IsBusy="@occupato" />
+            <RadzenLink Path="/register" Text="Non hai un account? Registrati" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenCard>
+
+@code {
+    private LoginModel model = new();
+    private string? errore;
+    private bool occupato;
+
+    private async Task OnSubmit(LoginModel m)
+    {
+        occupato = true;
+        errore = await Auth.LoginAsync(m.Email, m.Password);   // null = login riuscito
+        occupato = false;
+
+        if (errore == null)
+            Nav.NavigateTo("/");   // poi qui andrà il redirect in base al ruolo
+    }
+}
