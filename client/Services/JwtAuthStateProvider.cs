@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 namespace Client.Services;
 
 // Blazor chiama GetAuthenticationStateAsync per sapere chi è l'utente e che ruolo ha.
-// Il token è nel localStorage; qui ne leggo il payload (la parte centrale del JWT).
+// Il token è nel localStorage; qui ne leggo il payload 
 public class JwtAuthStateProvider : AuthenticationStateProvider
 {
   private readonly ILocalStorageService _storage;
