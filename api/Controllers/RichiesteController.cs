@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Dtos;
 using Microsoft.AspNetCore.Authorization;
-
 namespace Api.Controllers;
 
 // Tabella richieste (tutte le rotte richiedono il token)
@@ -256,12 +255,13 @@ public class RichiesteController : ControllerBase
         {
             // Dipendente: solo le sue e solo se ancora in attesa
             if (richiesta.UtenteId != UtenteCorrenteId)
-                return NotFound();   // di un altro: come se non esistesse
+                return NotFound();  // 404 
 
             if (richiesta.Stato != "In attesa")
-                return BadRequest("Si può eliminare solo una richiesta in attesa.");
+                return BadRequest("Si può eliminare solo una richiesta in attesa."); // 400
         }
-        // Il Responsabile arriva qui senza altri controlli: elimina anche le approvate
+
+        // In questo punto arriva solo il responsabile, che può eliminare tutte le richieste ( al contrario del dipendente, che può eliminare solo le sue e solo se in attesa)
 
         _context.RichiestePermessos.Remove(richiesta);
         await _context.SaveChangesAsync();

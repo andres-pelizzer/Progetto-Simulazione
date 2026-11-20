@@ -1,0 +1,53 @@
+@page "/register"
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<RadzenCard Style="max-width: 420px; margin: 3rem auto;">
+    <RadzenText TextStyle="TextStyle.H5">Registrazione</RadzenText>
+
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Visible="@(errore != null)" AllowClose="false">@errore</RadzenAlert>
+
+    <RadzenTemplateForm TItem="RegisterModel" Data="@model" Submit="@OnSubmit">
+        <RadzenStack Gap="1rem">
+            <RadzenFormField Text="Nome">
+                <RadzenTextBox @bind-Value="model.Nome" Name="Nome" />
+            </RadzenFormField>
+            <RadzenRequiredValidator Component="Nome" Text="Nome obbligatorio" />
+
+            <RadzenFormField Text="Cognome">
+                <RadzenTextBox @bind-Value="model.Cognome" Name="Cognome" />
+            </RadzenFormField>
+            <RadzenRequiredValidator Component="Cognome" Text="Cognome obbligatorio" />
+
+            <RadzenFormField Text="Email">
+                <RadzenTextBox @bind-Value="model.Email" Name="Email" />
+            </RadzenFormField>
+            <RadzenRequiredValidator Component="Email" Text="Email obbligatoria" />
+            <RadzenEmailValidator Component="Email" Text="Email non valida" />
+
+            <RadzenFormField Text="Password">
+                <RadzenPassword @bind-Value="model.Password" Name="Password" />
+            </RadzenFormField>
+            <RadzenRequiredValidator Component="Password" Text="Password obbligatoria" />
+
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Registrati" IsBusy="@occupato" />
+            <RadzenLink Path="/login" Text="Hai già un account? Accedi" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenCard>
+
+@code {
+    private RegisterModel model = new();
+    private string? errore;
+    private bool occupato;
+
+    private async Task OnSubmit(RegisterModel m)
+    {
+        occupato = true;
+        errore = await Auth.RegisterAsync(m.Nome, m.Cognome, m.Email, m.Password);
+        occupato = false;
+
+        if (errore == null)
+            Nav.NavigateTo("/login");   // registrato: ora può fare il login
+    }
+}
