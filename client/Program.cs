@@ -12,7 +12,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // questo serve ai componenti per modificare il <head>
 
 
-var apiUrl = "http://localhost:5238";   // indirizzo dell'API: da cambiare al deploy
+var apiUrl = "http://localhost:5238";   // indirizzo dell'API
 
 builder.Services.AddBlazoredLocalStorage(); // questo registra ILocalStorageService, l'oggetto che legge e scrive nel localStorage del browser
 
