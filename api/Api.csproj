@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">      <!--Sta ad indicare applicazione web server-->
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-     <Nullable>enable</Nullable> <!--avvisa che tutti i riferimenti non possono essere null -->
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net10.0</TargetFramework>   <!--Versione del framework-->
+     <Nullable>enable</Nullable> <!--avvisa che tutti i riferimenti  possono essere null -->
+    <ImplicitUsings>enable</ImplicitUsings> <!--aggiunge in automatico gli using più comuni -->
   </PropertyGroup>
 
   <ItemGroup>
