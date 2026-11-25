@@ -39,8 +39,8 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
   public async Task Login(string token)
   {
-    await _storage.SetItemAsStringAsync("token", token);
-    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    await _storage.SetItemAsStringAsync("token", token); // qui salva il token nel local storage
+    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync()); // avvisa Blazor che lo stato di login è cambiato
   }
 
   public async Task Logout()
