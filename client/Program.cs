@@ -28,6 +28,7 @@ builder.Services.AddCascadingAuthenticationState(); // rende lo stato di login d
 builder.Services.AddScoped<JwtAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<JwtAuthStateProvider>());
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<RichiesteService>();
 builder.Services.AddRadzenComponents();
 
 

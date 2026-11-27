@@ -1,18 +1,68 @@
 @page "/dipendente"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Dipendente")]
+@inject RichiesteService RichiesteService
 
+@if (loading)
+{
+  <p>Caricamento...</p>
+}
+else
+{
+  <RadzenDataGrid AllowPaging="true" PageSize="5" ColumnWidth="150px" AllowFiltering="true" Data="@richieste"
+                  TItem="RichiestaModel">
+    <Columns>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="RichiestaId" Title="ID" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="DataRichiesta" Title="DataRichiesta" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="DataInizio" Title="DataInizio" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="DataFine" Title="DataFine" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="Motivazione" Title="Motivazione" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="Stato" Title="Stato" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="CategoriaId" Title="CategoriaId" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="Categoria" Title="Categoria" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="DataValutazione" Title="DataValutazione" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Property="Valutatore" Title="Valutatore" Width="80px"
+                            TextAlign="TextAlign.Center"></RadzenDataGridColumn>
+      <RadzenDataGridColumn TItem="RichiestaModel" Title="Azioni" Sortable="false" Filterable="false" Width="120px"
+                            TextAlign="TextAlign.Center">
+        @* <Template Context="richiesta">
+          <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                        Click="@(() => ModificaProdotto())" />
+          <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                        Click="@(() => EliminaProdotto())" />
+        </Template> *@
+      </RadzenDataGridColumn>
 
+    </Columns>
 
-
-
-
-@code {
-  
-
-  private async Task OnInitalizedAsync()
-  {
-    
-  }
+  </RadzenDataGrid>
 
 }
+
+@code {
+ 
+  private List<RichiestaModel> richieste = new();
+  
+  bool loading = true;
+  protected override async Task OnInitializedAsync()
+  {
+    loading = false;
+    await RichiesteService.GetRichieste();
+    
+
+  }
+
+
+
+
+}
+
